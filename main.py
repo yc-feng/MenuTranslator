@@ -7,10 +7,16 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, AudioMessage
+    MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, AudioMessage, ImageMessage
 )
 import os
+import io
 import uuid
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "keyFile.json"
+
+from google.cloud import vision
+
+
 
 from src.models import OpenAIModel
 from src.memory import Memory
@@ -26,6 +32,8 @@ load_dotenv('.env')
 app = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
+# set public open ai api
+#api_key = os.getenv('OPENAI_API')
 storage = None
 youtube = Youtube(step=4)
 website = Website()
@@ -175,6 +183,57 @@ def handle_audio_message(event):
     os.remove(input_audio_path)
     line_bot_api.reply_message(event.reply_token, msg)
 
+
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image_message(event):
+    user_id = event.source.user_id
+    image_content = line_bot_api.get_message_content(event.message.id)
+    input_image_path = f'{str(uuid.uuid4())}.png'
+    print(input_image_path)
+    with open(input_image_path, 'wb') as fd:
+        for chunk in image_content.iter_content():
+            fd.write(chunk)
+
+    try:
+        if not model_management.get(user_id):
+          raise ValueError('Invalid API token')
+        else:
+          # Instantiates a client
+          client = vision.ImageAnnotatorClient()
+      
+          # Opens the input image file
+          with io.open(input_image_path, "rb") as image_file:
+              content = image_file.read()
+      
+          image = vision.Image(content=content)
+      
+          # For dense text, use document_text_detection
+          # For less dense text, use text_detection
+          response = client.document_text_detection(image=image)
+          text = response.full_text_annotation.text
+          text = '以下為菜單圖片轉換為文字檔，請將以下內容翻譯為繁體中文菜單並以表格的方式，此表格包含原文項目名稱、中文項目名稱、價格\n 若你認為以下文字並非菜單，請回覆此圖片非菜單\n' + text
+          logger.info(f'{user_id}: {text}')
+          memory.append(user_id, 'user', text)
+          is_successful, response, error_message = model_management[user_id].chat_completions(memory.get(user_id), 'gpt-3.5-turbo')
+          if not is_successful:
+            raise Exception(error_message)
+          role, response = get_role_and_content(response)
+          memory.append(user_id, role, response)
+          msg = TextSendMessage(text=response)
+      
+        
+    except ValueError:
+        msg = TextSendMessage(text='請先註冊你的 API Token，格式為 /註冊 [API TOKEN]')
+    except KeyError:
+        msg = TextSendMessage(text='請先註冊 Token，格式為 /註冊 sk-xxxxx')
+    except Exception as e:
+        memory.remove(user_id)
+        if str(e).startswith('Incorrect API key provided'):
+            msg = TextSendMessage(text='OpenAI API Token 有誤，請重新註冊。')
+        else:
+            msg = TextSendMessage(text=str(e))
+    os.remove(input_image_path)
+    line_bot_api.reply_message(event.reply_token, msg)
 
 @app.route("/", methods=['GET'])
 def home():
