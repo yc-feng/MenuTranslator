@@ -1,6 +1,28 @@
-# ChatGPT Line Bot
+# MenuTranslator
 
 [中文](README.md) | English
+
+
+## New features by [@yc-feng](https://github.com/yc-feng)
+- Added menu translation function. After directly uploading the menu image, Line Bot will return the original text and traditional Chinese menu. Currently, it will only translate other languages into Chinese, and other functions no changed
+
+
+## Add installation steps
+- Using Google Vision API
+     1. Create a Google Cloud project
+     2. Enable Vision API
+     3. Obtain the key and save it as `keyFile.json` file
+
+
+## Demo
+<img src="https://github.com/yc-feng/MenuTranslator/blob/main/demo/MenuTranslator%20demo.jpg" width=375>
+
+
+
+
+### The following is the original README from project ChatGPT-Line-Bot 
+
+# ChatGPT Line Bot
 
 [![license](https://img.shields.io/pypi/l/ansicolortags.svg)](LICENSE) [![Release](https://img.shields.io/github/v/release/TheExplainthis/ChatGPT-Line-Bot)](https://github.com/TheExplainthis/ChatGPT-Line-Bot/releases/)
 
