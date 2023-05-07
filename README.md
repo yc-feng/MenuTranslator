@@ -1,8 +1,7 @@
-# ChatGPT Line Bot
+# MenuTranslator
 
 中文 | [English](README.en.md)
 
-[![license](https://img.shields.io/pypi/l/ansicolortags.svg)](LICENSE) [![Release](https://img.shields.io/github/v/release/TheExplainthis/ChatGPT-Line-Bot)](https://github.com/TheExplainthis/ChatGPT-Line-Bot/releases/)
 
 ## 新增功能 by @yc-feng 
 - 加入菜單翻譯功能，直接上傳菜單圖片後，Line Bot 會回傳原文及繁體中文的菜單，目前只會將其他語言翻譯成中文，其他功能不變
@@ -22,6 +21,10 @@
 
 
 ### 以下為原專案 ChatGPT-Line-Bot README
+
+# ChatGPT Line Bot
+
+[![license](https://img.shields.io/pypi/l/ansicolortags.svg)](LICENSE) [![Release](https://img.shields.io/github/v/release/TheExplainthis/ChatGPT-Line-Bot)](https://github.com/TheExplainthis/ChatGPT-Line-Bot/releases/)
 
 ## 更新
 - 2023/03/23 更新總結 Youtube 影片內容、新聞文章（支援：聯合報、Yahoo 新聞、三立新聞網、中央通訊社、風傳媒、TVBS、自由時報、ETtoday、中時新聞網、Line 新聞、台視新聞網）
